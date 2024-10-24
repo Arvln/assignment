@@ -3,15 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import type { ReactNode } from "react";
 
-type Content = {
-  id: string,
-  renderer: ReactNode
-}
-type ContentsKey = "image" | "text" | "carousel" | "default"
-
-const config: { [key in ContentsKey]: ReactNode } = {
+const config = {
   image: <Image
     src="/globe.svg"
     width={300}
@@ -22,8 +15,17 @@ const config: { [key in ContentsKey]: ReactNode } = {
   carousel: <div className="h-12">carousel content</div>,
   default: <div>目前不支援的編輯格式</div>
 }
+export type ContentsKey=keyof typeof config
+type Content = {
+  id: string,
+  type: ContentsKey
+}
 
-export const PreviewArea = () => {
+export const PreviewArea = ({
+  setSelectedEditorType
+}: {
+  setSelectedEditorType: (type: ContentsKey) => void
+}) => {
   const [contents, setContents] = useState<Content[]>([]);
 
   return (
@@ -32,17 +34,16 @@ export const PreviewArea = () => {
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         const type = e.dataTransfer.getData("text/plain") as ContentsKey;
-        setContents((prev) => [
-          ...prev, { id: uuidv4(), renderer: config[type] || config.default }
-        ]);
+        setContents((prev) => [...prev, { id: uuidv4(), type }]);
       }}
     >
       <ul>
-        {contents.map(({ id, renderer }) => (
+        {contents.map(({ id, type }) => (
           <li
             key={id}
+            onClick={() => setSelectedEditorType(type)}
           >
-            {renderer}
+            {config[type] || config.default}
           </li>
         ))}
       </ul>
