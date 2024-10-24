@@ -1,4 +1,4 @@
-export const Editor = () => {
+export const ElementCreator = () => {
   return (
     <aside className="w-1/4 h-full bg-indigo-800">
       <ul className="p-16 flex flex-col h-full">
