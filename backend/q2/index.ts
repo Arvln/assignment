@@ -97,7 +97,11 @@ let transactionLogs: ({
   status: "success",
   timestamp: string,
   amount: number,
-  depositedAccountId: string
+  balance: number,
+  depositedAccount: {
+    id: string,
+    balance: number
+  }
 } | {
   id: string,
   status: "error",
@@ -141,7 +145,11 @@ app.post<{ id: string }, unknown, { depositedAccountId: string, amount: string }
           status: "success" as const,
           timestamp: new Date().toISOString(),
           amount,
-          depositedAccountId
+          balance: accounts[id].balance(),
+          depositedAccount: {
+            id: depositedAccountId,
+            balance: accounts[depositedAccountId].balance()
+          }
         }
         transactionLogs.push(transactionLog);
         res.json(transactionLog);
