@@ -2,7 +2,7 @@ import express from "express";
 import { v4 as uuidv4 } from "uuid";
 
 export const app = express();
-const port = process.env.PORT || 3005;
+const port = 3000;
 
 app.use(express.json());
 
@@ -171,6 +171,8 @@ app.get('/transactions', (_, res) => {
     res.json(transactionLogs);
 });
 
-app.listen(port, () => {
-  console.log(`Example app url: http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`Example app url: http://localhost:${port}`);
+  });
+}
