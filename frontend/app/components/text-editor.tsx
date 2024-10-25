@@ -19,6 +19,7 @@ export const TextEditor = ({ close, inputValue, setInputValue }: {
             <span className="block pb-1">文字</span>
             <input
               className="w-full p-3 bg-indigo-500 text-black flex justify-center items-center"
+              type="text"
               onChange={(e) => setInputValue({ content: e.target.value })}
               value={inputValue.content}
             />
