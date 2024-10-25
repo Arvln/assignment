@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2016",
-    "module": "CommonJS", // 若想使用 import，請改為 "ESNext" 或 "ES6"
-    "outDir": "./dist", // 輸出目錄
+    "module": "CommonJS",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
