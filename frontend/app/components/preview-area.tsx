@@ -4,6 +4,7 @@ import Image from "next/image";
 import { type ReactNode, useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { InputValue, defaultInputValue } from "../page";
+import { Carousel } from "./carousel";
 
 const config = {
   image: <Image
@@ -13,7 +14,14 @@ const config = {
     alt="default image"
   />,
   text: <div className="h-12 flex items-center">請點擊以編輯文字</div>,
-  carousel: <div className="h-12">carousel content</div>,
+  carousel: <Carousel
+    width="300"
+    images={[
+    '/globe.svg',
+    '/globe.svg',
+    '/globe.svg',
+    ]}
+  />,
   default: <div>目前不支援的編輯格式</div>
 }
 export type ContentsKey=keyof InputValue
@@ -70,12 +78,14 @@ export const PreviewArea = ({
           return {
             ...content,
             value,
-            renderer: <div
-              className="h-12 flex items-center">
-              {value.width}
-              {value.height}
-              {value.src}
-            </div>
+            renderer: <Carousel
+              width={value.width}
+              images={[
+                value.leftSrc,
+                value.middleSrc,
+                value.rightSrc,
+              ]}
+            />
           };
         }
         else return content;

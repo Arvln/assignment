@@ -19,8 +19,9 @@ export const defaultInputValue = {
   },
   carousel: {
     width: "300",
-    height: "300",
-    src: "/globe.svg"
+    leftSrc: "/file.svg",
+    middleSrc: "/globe.svg",
+    rightSrc: "/window.svg"
   },
   default: {}
 }
@@ -48,6 +49,10 @@ export default function Home() {
     />,
     carousel: <CarouselEditor
       close={() => setSelectedEditorType("default")}
+      inputValue={inputValue as InputValue["carousel"]}
+      setInputValue={(inputValue: Partial<InputValue["carousel"]>) =>
+        setInputValue((prev) => ({ ...prev, ...inputValue }))
+      }
     />,
     default: null
   }
