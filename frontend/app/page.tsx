@@ -28,8 +28,8 @@ export type InputValue = typeof defaultInputValue
 
 export default function Home() {
   const [selectedEditorType, setSelectedEditorType] = useState<ContentsKey>("default")
-  const [inputValue, setInputValue] = useState(defaultInputValue.default);
-  const debouncedInputValue = useDebounce(inputValue, 300);
+  const [inputValue, setInputValue] = useState(defaultInputValue[selectedEditorType]);
+  const debouncedInputValue = useDebounce<typeof inputValue>(inputValue, 300);
 
   const editorConfig = {
     image: <ImageEditor
