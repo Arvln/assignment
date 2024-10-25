@@ -1,8 +1,10 @@
 import express from "express";
 import { v4 as uuidv4 } from "uuid";
 
-const app = express();
-const port = 3000;
+export const app = express();
+const port = process.env.PORT || 3005;
+
+app.use(express.json());
 
 const createAccount = (name: string, balance: number) => {
   let locked = false;
@@ -28,7 +30,7 @@ const createAccount = (name: string, balance: number) => {
 
   return {
     name,
-    balance,
+    balance: () => balance,
     deposit,
     withdraw
   };
@@ -36,7 +38,7 @@ const createAccount = (name: string, balance: number) => {
 
 type Account = ReturnType<typeof createAccount>;
 
-const accounts: {
+let accounts: {
   [key in string]: Account
 } = {};
 
@@ -68,7 +70,7 @@ app.post<{ id: string }, unknown, { amount: string }>('/accounts/:id/deposit', (
   } else {
     accounts[id]
       .deposit(amount)
-      .then(() => res.json({ id, balance: accounts[id].balance }));
+      .then(() => res.json({ id, balance: accounts[id].balance() }));
   }
 });
 
@@ -82,18 +84,15 @@ app.post<{ id: string }, unknown, { amount: string }>('/accounts/:id/withdraw', 
   } else if (isNaN(amount) || amount <= 0) {
     res.status(400).json({ error: "提款金額必須是正數" });
     return;
-  } else if (accounts[id].balance < amount) {
-    res.status(400).json({ error: "提款帳戶餘額不足" });
-    return;
   } else {
     accounts[id]
       .withdraw(amount)
-      .then(() => res.json({ id, balance: accounts[id].balance }))
+      .then(() => res.json({ id, balance: accounts[id].balance() }))
       .catch((error) => res.status(400).json({ error: error?.message }));
   }
 });
 
-const transactionLogs: ({
+let transactionLogs: ({
   id: string,
   status: "success",
   timestamp: string,
@@ -105,6 +104,11 @@ const transactionLogs: ({
   timestamp: string,
   message: string
 })[] = [];
+
+export const clearStore = async () => {
+  accounts = {};
+  transactionLogs = [];
+}
 
 app.post<{ id: string }, unknown, { depositedAccountId: string, amount: string }>('/accounts/:id/transfer', (req, res) => {
   const { id } = req.params;
@@ -120,9 +124,6 @@ app.post<{ id: string }, unknown, { depositedAccountId: string, amount: string }
   } else if (isNaN(amount) || amount <= 0) {
     res.status(400).json({ error: "轉帳金額必須是正數" });
     return;
-  } else if (accounts[id].balance < amount) {
-    res.status(400).json({ error: "提款帳戶餘額不足" });
-    return;
   } else {
     let withdrawRollback: () => Promise<void> | undefined;
     const actions = [
@@ -133,7 +134,7 @@ app.post<{ id: string }, unknown, { depositedAccountId: string, amount: string }
       async () => accounts[depositedAccountId].deposit(amount)
     ]
 
-    Promise.all(actions)
+    Promise.all(actions.map((action) => action()))
       .then(() => {
         const transactionLog = {
           id: uuidv4(),
