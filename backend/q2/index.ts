@@ -137,8 +137,12 @@ app.post<{ id: string }, unknown, { depositedAccountId: string, amount: string }
       },
       async () => accounts[depositedAccountId].deposit(amount)
     ]
+    
+    const commit = async () => {
+      for (const action of actions) await action();
+    }
 
-    Promise.all(actions.map((action) => action()))
+    commit()
       .then(() => {
         const transactionLog = {
           id: uuidv4(),
